@@ -1,0 +1,150 @@
+--- version 1.0 ---
+    Added verbose flag for showing additional information
+    New option for uniform/variable demand update in time
+    New option to read service area from SHP file
+    New option to generate structured quad mesh from boundary & export to shape file
+    Read 24 hourly O/D matrices when reading zones from shape file
+    Bar graph to show total trips per hour when reading O/D matrices
+    Excel file to introduce the simulator inputs by user (Data/inputs.xlsx)
+--- version 1.1 ---
+    Re-structured City class to include create/load service area & OD matrices
+    Created Station class for station definition
+    Created FreeFloatZone class for free float zone definition
+    Created Car class for vehicle definition
+    Generation of free float zones from geometrical zonification of service area
+    Added free float zone centroids to service area plot
+--- version 1.2 ---
+    New excel format for reading boundary points
+    Added function for reading stations list from excel
+    Removal of stations out of service area
+    Added station positions to service area plot
+    Added new properties for estimations of accumulated demand, returns and optimum cars to stations and FFzones
+--- version 1.3 ---
+    Edited inputs.xlsx. Added separated variables for FF and SB fleet size. Added no-service penalties variables.
+    Added optimization module directory.
+    Added vehicle distribution optimization module (optimDistribution.m) ver 1.0.
+    Added auxiliary optimization functions directory.
+    Added auxiliary functions NSPenalties, probEmpty, probFull ver 1.0.
+    Added generation of initial car distribution in stations and FF zones from optimDistribution.m
+    Added function to generate random points inside a region defined by boundary nodes
+    Plotting of cars added to system plot
+    Created list to store car IDs by station & by FFZone to speed up search by users
+    Added function to compute list of neighbors for every geometric region
+    New function that selects the optimum station locations
+    Added identification in what zone lies every station
+--- version 1.4 ---
+    Reordered method setStations in City class
+    New version of optimStations function
+    Added forecastDemand function that generates accumulated demand arrays
+    Added arrays to Car class to store values in time
+--- version 1.5 ---
+    Created new class User
+    Added method timeSimulation to City class
+    Added array to store Users in City class
+    New function to create users in every time step
+    Added list of stations in every zone to optimStations.m
+    Created new sim_dist function to define the distance used in the simulator
+    Implemented search for closest car when creating a user
+    Implemented assignment of car when creating a user
+    Added list of not serviced (dead) users when not finding an available car close enough
+    Added new parameter of penalty distance to assign car from SB instead of FF
+    - v1.5.1 -
+    Added option to fix the random seed in MainSimulation.m
+    Created different times for user: creation, Orig2Car, Trip, Car2Dest
+    Reorganized function setUsers to create users at every time step considering electric cars and parking options
+    Moved generation of list of stations in neighbor zones to optimStations.m
+    Modified function setCars in City.m to generate both electric and combustion cars depending on parameter percEcars
+    Added parking assignment at destination following flowchart when creating users
+    Implemented computation of trip times: origin2car, car drive, parking2destination
+    Added new function moveUsers to manage the users at a certain time step t
+    New script ProcessResults.m to analyze a results file plotting each car status over time
+    Check that random point if parking in FF does not lie outside the service region
+    Added new properties to user class for CarZoneO & CarZoneD
+    Added option to plot battery level in time for electric cars to ProcessResults.m
+    - v1.5.6 -
+    Implemented computation of minimum battery level for setting car status to not available
+    Added option to fix random seed at inputs.xlsx
+    Added new function rechargeCars to manage the recharging of electric cars every time step
+    Added additional time to park in street as distribution with mean value at inputs.xlsx
+    - v1.5.7 -
+    Created arrays to store list of cars & chargers in SB & FF over time for output results
+    New class Output to generate outputs (plots, tables, ...) from results file
+    Created excel spreadsheet outputs.xlsx to define output parameters by user
+    Implemented functions to generate tables for cars in station/zone at every hour (mean)
+    New function to generate a table with number of cars per each status at every hour (mean)
+    Debugged error when looking for closest car in FF at origin
+    - v1.5.8 -
+    Changed output tables to hourly columns
+    Implemented output tables to several sheets of an excel spreadsheet
+    Added option to choose a particular hour, station and/or zone for hourly tables
+    Implemented output of battery level for eCars in station/zone at every hour (mean)
+    Implemented output of empty slots and occupancy in every station at every hour (mean)
+    Implemented output of empty chargers and occupancy in every station at every hour (mean)
+--- version 1.6 ---
+    Implemented output of demand at origin/destination from/to stations in every zone at every hour (sum)
+    Implemented output of demand at origin/destination from/to zones in every zone at every hour (sum)
+    Implemented output of average access/egress time in every zone at every hour (mean)
+    - v1.6.1 -
+    Added parking in station probability for every zone in shape file (if not present, use param.percParking for every zone)
+    Implemented functions to generate plots from tables based on FF and SB
+    Added flag in outputs.xlsx to generate graphical plots for every table
+    - v1.6.2 -
+    Fixed problem with colorbar not showing proper range for output plots
+    New version from Enrique with Repositioning classes
+    - v1.6.3 -
+    Restructuring output class by categories
+    Implemented output category Vehicles (hourly, aggregation by T, aggregation by R)
+    New version from Enrique
+    - v1.6.4 -
+    Implemented warmup phase before simulation (added new parameter in inputs.xlsx)
+    Added random seed to export, if not set by the user, for reproducibility
+    - v1.6.5 -
+    Implemented output category BatteryLevel (hourly, aggregation by T, aggregation by R)
+    Implemented output category StationOccupancy (hourly, aggregation by T, aggregation by R)
+    Implemented output category Unbalance (hourly, aggregation by T, aggregation by R)
+    Simulator debugging by Enrique
+    - v1.6.6 -
+    Added option in outputs.xlsx to choose detail level (hourly, AggT, AggR)
+    Changed output of average access and egress time to distance
+    Implemented output category Demand (hourly, aggregation by T, aggregation by R)
+    Simulator improvements by Enrique
+    Additional time to park in street depending on P_SB
+    - v1.6.7 -
+    Implemented output category Repositioning (hourly, aggregation by T, aggregation by R)
+    Removed option to choose Time, StationID, ZoneID from outputs excel sheet
+    Implemented summary table of results aggregated by R and T
+    Implemented summary table of costs
+    Created projects for compilation of CarSimulator and GenerateOutput
+    - v1.6.8 -
+    Implemented new tables of demand unbalance
+    Debugged generatePdfSummary.m
+    Debugged calculateImbalanceParam.m
+    Created function estimateODmatrices.m for the OD matrices estimation from aggregated parameters
+    The OD matrices estimation from aggregated parameters has been corrected
+    Added variable in inputs.xlsx "Odmat_out" for the .csv output
+    Debugged optimRepoTaskPwise.m
+    Created function outputODMatrices.m to generate the .csv output
+    Changed setup of directory routes by using ctfroot or pwd if compiled or not
+    - v1.6.9 -
+    Added function to output Stations to Results/input folder
+    Changes in the repositioning statistics accounting
+    JPG figure outputs now include titles
+    - v1.7.0 -
+    Added property "taskMovements" to RepoTeam objects. Changed simulation.m, and repositioning functions.
+    Changed procedure on aborted repositioning tasks. Now, they are not accounted in the taskList of RepoTeam
+    Changed outputRepositioning.m to recalculate according to the previous changes
+    Solved an error of estimateODMatrices.m function
+    Debugged optimRepoTaskPwise.m. Now rebalancing operations are assigned properly.
+    - v1.7.1 -
+    Make-up of figures and tables with the correct labels and units.
+    - v1.7.2 -
+    Figures "Demand__ZoneFF__" now are represented as station figures, not zones.
+    Figures "VehiclesTakenFF_AggR" now are correctly represented.
+    Figures "UnbalanceCarsTotal" now are correctly represented.
+    Solved an error of City.m. Users no longer are make the trip if the origin and destination station are the same.
+    Users now take at least one minute per action (i.e reaching the car, travelling, egressing)
+    
+
+
+DOUBTS
+Plotting hourly tables: fixed scale for 24h or hour-by-hour? Every plot its own scale !! SOLVED
