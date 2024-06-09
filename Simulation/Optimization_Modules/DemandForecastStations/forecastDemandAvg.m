@@ -1,8 +1,6 @@
 function [vStationsOut, vZonesOut] = forecastDemandAvg(vStations, vZones, ...
-                    vServArea, vRepoTeams,...
-                    TotalCarsSB, TotalCarsFF,...
-                    OD, Wmax, TotalTime)
-% FORECASTDEMAND - ver 1.0
+                    vServArea, vRepoTeams, OD, param)...
+% FORECASTDEMAND - ver 1.3 (2024.06.01)
 %   Forecast the demand and creates vectors of total accumulated returns
 %   and request on all time steps for each station and zone.
 %   INPUTS:
@@ -24,6 +22,16 @@ function [vStationsOut, vZonesOut] = forecastDemandAvg(vStations, vZones, ...
 %   geometry of zones.
 % ver 1.2
 %   Add expected task movements.
+% ver 1.3
+%   param as input.
+
+%%% Parameters
+
+TotalCarsSB = param.TotalCarsSB;
+TotalCarsFF = param.TotalCarsFF;
+TotalTime = param.TotalTime;
+Wmax = param.Wmax;
+disrp = param.forecast_disruption;
 
 % Number of zones and stations
 NZones = numel(vZones);
@@ -59,7 +67,7 @@ pct_sb_prk = zeros(NZones,1);
 %%% Accumulated returns and requests for all time steps.
 % (Note that on t=0, accumulated demand is zero.)
 
-    rnd = random('unif',0,0,[numel(vStations),2]);     % RANDOM ERROR
+    rnd = random('unif',max([-1,-disrp]),disrp,[numel(vStations),2]);     % RANDOM ERROR
     
     for t=2:TotalTime+1
 
@@ -105,11 +113,14 @@ pct_sb_prk = zeros(NZones,1);
         end  
     end
 
+% Storing results
+for istat=1:numel(vStations)
+    vStations{istat}.predRequests = vStations{istat}.accRequests;
+    vStations{istat}.predReturns = vStations{istat}.accReturns;
+end  
 vZonesOut = vZones;
 vStationsOut = vStations;
 
-% save ('vStations_DMDErr_0_0.mat', 'vStationsOut');
-% save ('vStations_DMDAvg.mat', 'vStationsOut');
 
 end
 

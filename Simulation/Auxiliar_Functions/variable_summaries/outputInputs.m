@@ -1,22 +1,26 @@
 function outputInputs(param, t, nameDir)
-%OUTPUTINPUTS - ver. 1.2 (2022.01.29)
+%OUTPUTINPUTS - ver. 1.3 (2024.06.01)
 %   Creates the input summary in a txt file.
 
     % List of fields in struct
     list_f = fieldnames(param);
     
     % List of units
-    units = {'', 'minutes', 'cycles', '', '', '', '', '', '', '', '',...
-        'minutes', '', 'trips/cycle', '[fraction of trips]',...
+    units = {'', ...                                                       % Version
+        'minutes', 'cycles', '', '',...                                    % SIMULATION inputs
+        '', '', '', '',...                                                 % SERVICE AREA inputs
+        '', '','minutes', '', 'trips/cycle', '[fraction of trips]',...     % DEMAND inputs
         '[fraction of area]', '[fraction of area]', '', '',...
-        'degrees from North', '', '', '', '', 'stations',  '', '',...
-        'parking slots', 'charging points', 'cars', 'cars', 'cars',...
-        '[fraction of cars]', 'kilometers', 'minutes', '[percentage]', 'meters',...
-        'km/h', 'km/h', 'minutes', '', '[fraction of trips]', 'meters', '',...
-        '€/lost trip', '€/lost trip', '', 'teams', 'vehicles/team', 'km/h', 'minutes',...
-        '€/h', ''};
+        'degrees from North', '', '', '', '',...                           
+        'stations', '', '', 'parking slots', 'charging points',...         % STATION inputs
+        'cars', 'cars', 'cars', '[fraction of cars]', 'kilometers',...     % FLEET inputs
+        'minutes', '[percentage]', '', '',...
+        'meters', 'km/h', 'km/h', 'minutes', '', '[fraction of trips]',... % USER inputs
+        'meters', '', '€/lost trip', '€/lost trip',...
+        '', 'teams', 'vehicles/team', 'km/h', 'minutes', '€/h',...         % REPOSITIONING inputs
+        '', '', '[percentage]', '[percentage]', '[percentage]'};           % Perc forecast error and low battery
     %%% NOTA: Mejor hacer algo para leerlo directamente del excel por si se
-    %%% cambian parámetros.
+    %%% cambian parámetros. O directamente eliminar unidades.
 
     % Write fields to text file
     filename = [nameDir t '_rawInputs.txt'];

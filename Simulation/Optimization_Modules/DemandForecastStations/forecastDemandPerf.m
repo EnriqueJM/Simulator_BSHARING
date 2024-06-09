@@ -4,6 +4,7 @@ function [vStationsOut, vZonesOut] = forecastDemandPerf(vStations, vZones,...
 %   Detailed explanation goes here
 
 TotalTime = param.TotalTime;
+disrp = param.forecast_disruption;
 
 %%% Calculation of expected demand and parking fraction on street/station.
 
@@ -12,7 +13,7 @@ TotalTime = param.TotalTime;
         usrs_idx = vUsersGen(:,1)==(t+usr_timer-1);
         usrs_in_t = vUsersGen(usrs_idx,:);
         
-        rnd = random('unif',-1,2,[numel(vStations),1]);     % RANDOM ERROR
+        rnd = random('unif',max([-1,-disrp]),disrp,[numel(vStations),2]);     % RANDOM ERROR
 
         if size(usrs_in_t,1)>0
             for i=1:size(usrs_in_t,1)
@@ -37,11 +38,13 @@ TotalTime = param.TotalTime;
         end        
     end
 
+% Storing results
+for istat=1:numel(vStations)
+    vStations{istat}.predRequests = vStations{istat}.accRequests;
+    vStations{istat}.predReturns = vStations{istat}.accReturns;
+end  
 vZonesOut = vZones;
 vStationsOut = vStations;
-
-
-save ('vStations_DMDPerf_Err2_2.mat', 'vStationsOut');
 
 end
 

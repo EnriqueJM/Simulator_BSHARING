@@ -13,16 +13,16 @@ function E_NSP_i = NSPenalties(m_i, req_h, ret_h, Cap_i, beta)
 %   OUTPUTS:
 %   - E_NSP_i -> Expected no service penalty cost for station i.
 
-alpha_ret = 0.95;
-alpha_req = 4.95;
+% alpha_ret = 0.95;
+% alpha_req = 4.95;
 
 E_NSP_i = 0;
 
     if req_h ~= 0 || ret_h ~= 0
-%         E_NSP_i = beta(1) * req_h * probEmpty(m_i, req_h, ret_h) ...
-%             + beta(2) * ret_h * probFull(m_i, req_h, ret_h, Cap_i);
-        E_NSP_i = beta(1) * alpha_req * expectEmpty(m_i, req_h, ret_h) ...
-            + beta(2) * alpha_ret * expectFull(m_i, req_h, ret_h, Cap_i);
+        E_NSP_i = beta(1) * req_h * expectEmpty(m_i, req_h, ret_h) ...
+            + beta(2) * ret_h * expectFull(m_i, req_h, ret_h, Cap_i);
+%         E_NSP_i = beta(1) * alpha_req * expectEmpty(m_i, req_h, ret_h) ...
+%             + beta(2) * alpha_ret * expectFull(m_i, req_h, ret_h, Cap_i);
     end
     
 end
@@ -66,8 +66,9 @@ function result_P_e = expectEmpty (m_i, req_h, ret_h)
 %%% Upper bound is always -1.
 %%% Even in the best case, the probability of suffering 1 no-service
 %%% situation is calculated.
-    max_variation = floor(avg_D_h - 4 * stdev_D_h);
-    limit_int = min(-1, m_i + max_variation);
+   max_variation = floor(avg_D_h - 4 * stdev_D_h);
+   limit_int = min(-1, m_i + max_variation);
+%     limit_int = -3*ones(size(m_i));
 
 %%% Numerical integration for the set of N stations/FF_zones.
 %%% Vehicle variation is a Skellam distribution. However, it can be
@@ -114,7 +115,8 @@ function result_P_f = expectFull (m_i, req_h, ret_h, Cap_i)
 %%% Even in the best case, the probability of suffering 1 no-service
 %%% situation is calculated.    
     max_variation = ceil(avg_D_h + 4 * stdev_D_h);
-    limit_int = max(1, max_variation + m_i - Cap_i);
+    limit_int = max(Cap_i+1, max_variation + m_i - Cap_i);
+%     limit_int = Cap_i+3;
         
 %%% Numerical integration for the set of N stations/FF_zones.
 %%% Vehicle variation is a Skellam distribution. However, it can be
@@ -122,11 +124,11 @@ function result_P_f = expectFull (m_i, req_h, ret_h, Cap_i)
     for i=1:length(m_i)
         
 %%% Only if there is a capacity constraint.
-        if Cap_i(i) ~= Inf
+        if Cap_i(i) ~= Inf || Cap_i(i) < 99999
 
             aux_int = zeros(limit_int(i)+1,1);
          
-            for x = 0:limit_int(i)               
+            for x = Cap_i(i):limit_int(i)               
                 aux_int(x+1) = normpdf(x,m_i(i)+avg_D_h(i),stdev_D_h(i))*x;             
             end
             

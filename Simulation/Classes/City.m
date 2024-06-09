@@ -107,17 +107,18 @@ classdef City<handle
             if param.verbose
                 disp('Forecasting demand on stations and zones for next cycle.');
             end
+            
+            if param.forecast_method == 'average'
             % Average demand forecast
-            [obj.vStations, obj.vFreeFloatZones] = ...
-                forecastDemandAvg(obj.vStations, obj.vFreeFloatZones,...
-                    obj.servArea, obj.vRepoTeams,...
-                    param.TotalCarsSB, param.TotalCarsFF,...
-                    obj.OD, param.Wmax, param.TotalTime);
-                
+                [obj.vStations, obj.vFreeFloatZones] = ...
+                    forecastDemandAvg(obj.vStations, obj.vFreeFloatZones,...
+                        obj.servArea, obj.vRepoTeams, obj.OD, param);
+            elseif param.forecast_method == 'perfect'
               % "Perfect" demand forecast.  
-%             [obj.vStations, obj.vFreeFloatZones] = ...
-%                 forecastDemandPerf(obj.vStations, obj.vFreeFloatZones,...
-%                     obj.vCars, obj.vUsersGen, param, obj.usr_timer);
+                [obj.vStations, obj.vFreeFloatZones] = ...
+                    forecastDemandPerf(obj.vStations, obj.vFreeFloatZones,...
+                        obj.vCars, obj.vUsersGen, param, obj.usr_timer);
+            end
             %
             % Estimate expected task list (if necessary)
             if param.repoMethod == 2 || param.repoMethod == 3
@@ -127,8 +128,12 @@ classdef City<handle
                     disp('Optimizing predefined repositioning route');     % Route estimation
                 end
                 %
+                [obj.vRepoTeams, obj.vStations] = ...
+                    optimRepoRouteDual_bikSB_Tmax(obj.vRepoTeams, obj.vStations,...
+                    obj.vCars, param);
+                
 %                 [obj.vRepoTeams, obj.vStations] = ...
-%                     optimRepoRouteDual_bikSB_2(obj.vRepoTeams, obj.vStations,...
+%                     optimRepoRouteDual_bikSB_Tfix(obj.vRepoTeams, obj.vStations,...
 %                     obj.vCars, param);
             end
             %
@@ -271,7 +276,7 @@ classdef City<handle
                 % Initialize OD
                 obj.OD = struct();
                 %
-                for i=1:24   % 24 hours
+                for i=1:param.TotalTime/param.TimeReDemand   % 24 hours
                     filename = [param.Odmat_prefix '_' num2str(i-1) '.csv'];
                     %
                     try
@@ -292,13 +297,7 @@ classdef City<handle
                     end
                     clear A;
                 end
-                
-                %%%%CREATES ONE WEEK
-                for j=1:2
-                    for i=1:24
-                        obj.OD(j*24+i).Matrix =obj.OD(i).Matrix;
-                    end
-                end
+  
                 
             elseif param.OdmatKnown == 0
                 %%% OPTION 2 - Create O/D matrices from zonification and
@@ -446,14 +445,31 @@ classdef City<handle
         function setCars(param, obj)
             % Function to generate initial distribution of cars between
             % stations & free float zones
-            obj.numCars = param.TotalCarsSB + param.TotalCarsFF;
+            %
+            if param.IniDistributionKnown == 0
+                %%% Unkown initial distribution
+                %
+                % Compute optimum car distribution in SB at t=0
+                [obj.vStations] = optimDistribution(obj.vStations, param.TotalCarsSB, 1, param.costLostSB);
+                % Compute optimum car distribution in FF at t=0
+                [obj.vFreeFloatZones] = optimDistribution(obj.vFreeFloatZones, param.TotalCarsFF, 1, param.costLostFF);
+                % Total number.
+                obj.numCars = param.TotalCarsSB + param.TotalCarsFF;
+            elseif param.IniDistributionKnown == 1
+                % Read optimum vehicle distribution in SB at t=0
+                [obj.vStations] = readDistribution(obj.vStations, param, 'SB');
+                % Read optimum vehicle distribution in FF at t=0
+                % [obj.vFreeFloatZones] = readDistribution(obj.vFreeFloatZones, param, 'FF');
+                % Total number.
+                obj.numCars = param.TotalCarsSB + param.TotalCarsFF;
+            end
+            % Number of electric
             numEcars = ceil(param.percEcars * obj.numCars);
             
-            % Compute optimum car distribution in SB at t=0
+            % Counter of vehicles
             count = 0;
             count_eCar = 0;
             if obj.numStations > 0
-                [obj.vStations] = optimDistribution(obj.vStations, param.TotalCarsSB, 1, param.costLostSB);
                 % Create cars in Stations
                 for i=1:obj.numStations
                     X = obj.vStations{i}.X;                                % Station position
@@ -482,8 +498,7 @@ classdef City<handle
                 end
             end
             
-            % Compute optimum car distribution in FF at t=0
-            [obj.vFreeFloatZones] = optimDistribution(obj.vFreeFloatZones, param.TotalCarsFF, 1, param.costLostFF);
+            
             % Create cars in Free Float Zones
             for i=1:obj.numFreeFloatZones
                 XB = obj.servArea(i).X;                                    % List of nodes in zone boundary
@@ -530,8 +545,8 @@ classdef City<handle
                 %
                 for i=1:size(dem,1)
                     Daux = dem(i)/60;
-                    CUaux = poissrnd(Daux);
-%                     CUaux = poissrnd(Daux)*(1+normrnd(0,0.5));
+%                     CUaux = poissrnd(Daux);
+                    CUaux = poissrnd(Daux)*(1+normrnd(0,0.05));
                     %
                     for iuser=1:CUaux
                         zoneO = zo(i);
@@ -1290,8 +1305,10 @@ classdef City<handle
                 end                              
             end
             % Optimal distribution on street
-            [obj.vFreeFloatZones] = optimDistribution(...
-                    obj.vFreeFloatZones, m_FF, t, [param.costLostFF(1); param.costLostFF(2)]);
+            if m_FF ~=0
+                [obj.vFreeFloatZones] = optimDistribution(...
+                        obj.vFreeFloatZones, m_FF, t, [param.costLostFF(1); param.costLostFF(2)]);
+            end
         end
         
     end

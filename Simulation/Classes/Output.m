@@ -625,8 +625,8 @@ classdef Output<handle
             if param.StationOccupancy == 1
                 obj.Summary = [obj.Summary; {'' '' ''}];
                 obj.Summary = [obj.Summary; {'STATION OCCUPANCY' '' ''}];
-                outputStationOccupancy(param, folder, thi, thf, StationI, StationF, obj);
-%                 outputStationOccupancy_2(param, folder, thi, thf, StationI, StationF, obj);
+%                 outputStationOccupancy(param, folder, thi, thf, StationI, StationF, obj);
+                outputStationOccupancy_2(param, folder, thi, thf, StationI, StationF, obj);
             end
             if param.Unbalance == 1
                 obj.Summary = [obj.Summary; {'' '' ''}];
@@ -676,7 +676,7 @@ classdef Output<handle
             % Get table by name
             tab = obj.(tab_name);
             cols = tab.Properties.VariableNames;
-            cmap = colormap(jet);
+            cmap = colormap(flipud(bone));
            
             % Create folder to export jpg
             k = find(xlsfile=='/');
@@ -719,7 +719,7 @@ classdef Output<handle
                 figure('Visible','off');
                 mapshow(obj.MyCity.servArea, 'FaceColor', 'none')
                 set(gca,'fontname','times')
-%                 colormap(flipud(bone))
+                colormap(flipud(bone))
                 hold on;
                 %
                 for j=1:obj.MyCity.numStations
@@ -731,7 +731,7 @@ classdef Output<handle
                     hold on;
                 end
                 % Set colormap
-                colormap jet;
+%                 colormap jet;
                 h = colorbar('Ticks',[0, 0.5 ,1], 'TickLabels', ...
                     {num2str(cmin,'%.2f'), num2str((cmax+cmin)/2,'%.2f'), num2str(cmax,'%.2f')});
                 ylabel(h, unit_labl,'fontname','times', 'FontSize', 14);
@@ -740,7 +740,7 @@ classdef Output<handle
                 % Title
                 title(titulo, 'Interpreter','none','fontname','times', 'FontSize', 16);
                 %subtitle(['Table: ' tab_name ' - ' cols{i}], 'Interpreter','none');
-                subtitle('(Bike-sharing, no rebalancing)', 'Interpreter','none','fontname','times');
+                subtitle('Scenario 1 (Real-time pairwise assignment)', 'Interpreter','none','fontname','times');
                 xlabel('X UTM Coordinate [m]','fontname','times', 'FontSize', 14)
                 ylabel('Y UTM Coordinate [m]','fontname','times', 'FontSize', 14)
                 

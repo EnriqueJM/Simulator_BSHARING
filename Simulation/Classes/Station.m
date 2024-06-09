@@ -18,6 +18,8 @@ classdef Station<handle
         numBikes
         accRequests            % accumulated demand over time
         accReturns             % accumulated returns over time
+        predRequests           % prediction of accumulated demand over time
+        predReturns            % prediction of accumulated returns over time
         
         optCars                % optimum number of cars over time
         listCars               % list of cars in station
@@ -48,6 +50,8 @@ classdef Station<handle
             obj.numBikes = [];
             obj.accRequests = [];
             obj.accReturns = [];
+            obj.predRequests = [];
+            obj.predReturns = [];
             
             obj.optCars = [];
             obj.listCars = [];

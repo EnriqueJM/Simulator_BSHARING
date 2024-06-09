@@ -80,7 +80,6 @@ end
 %                       TIME PARAMETERS
 %--------------------------------------------------------------------------    
 % Array of demand updates
-param.TotalTime = param.TotalTime*3;
 n_upd = floor(param.TotalTime / param.TimeReDemand);
 param.ArrayReDemand = param.TimeReDemand * (1:n_upd);
 
